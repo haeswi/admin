@@ -28,7 +28,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage }).array("images", 10);
 
-
 // Инициализация базы
 const db = new sqlite3.Database('./db.sqlite', (err) => {
   if (err) return console.error(err.message);
@@ -45,7 +44,6 @@ db.run(`CREATE TABLE IF NOT EXISTS objects (
   images TEXT,
   isPopular INTEGER DEFAULT 0
 )`);
-
 
 // Получение объектов
 app.get('/api/objects', (req, res) => {
@@ -71,6 +69,15 @@ app.post('/api/objects', upload, (req, res) => {
     });
 });
 
+// ✅ Удаление объекта
+app.delete('/api/objects/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.run(`DELETE FROM objects WHERE id = ?`, [id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
