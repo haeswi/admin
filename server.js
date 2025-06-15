@@ -82,3 +82,20 @@ app.delete('/api/objects/:id', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+// ✅ Обновление объекта
+app.put('/api/objects/:id', (req, res) => {
+  const id = req.params.id;
+  const { type, city, district, price, description, isPopular } = req.body;
+  const popularFlag = (isPopular === 'true' || isPopular === true || isPopular === '1') ? 1 : 0;
+
+  db.run(
+    `UPDATE objects
+     SET type = ?, city = ?, district = ?, price = ?, description = ?, isPopular = ?
+     WHERE id = ?`,
+    [type, city, district, price, description, popularFlag, id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ success: true });
+    }
+  );
+});
